@@ -3,6 +3,7 @@ name = "koma"
 version = "0.1.0"
 description = "KOMA: offline manga and manhwa reader"
 edition = "2021"
+license = "MIT"
 
 [lib]
 name = "koma_lib"

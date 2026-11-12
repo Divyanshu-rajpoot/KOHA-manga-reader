@@ -14,6 +14,7 @@
   <img alt="Built with Tauri 2" src="https://img.shields.io/badge/Tauri-2-e3242b">
   <img alt="Angular" src="https://img.shields.io/badge/Angular-22-e3242b">
   <img alt="Rust" src="https://img.shields.io/badge/Rust-stable-0e0e0e">
+  <img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-e3242b">
 </p>
 
 <p align="center">
@@ -194,7 +195,6 @@ Issues and pull requests are welcome. Before you start:
 
 ## License
 
-A license has not been chosen yet. Until one is added, the code is published for reading and
-contribution, with all rights reserved by the author.
+KOMA is released under the [MIT License](LICENSE).
 
 The bundled fonts (Anton, Archivo, IBM Plex Mono, Noto Sans JP) are under the SIL Open Font License.

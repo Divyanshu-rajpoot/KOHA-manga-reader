@@ -278,7 +278,7 @@ impl Archive {
             unreachable!("inflater was just created");
         };
 
-        let mut entry = archive
+        let entry = archive
             .by_index(page.cd_index)
             .map_err(|err| ArchiveError::Invalid(err.to_string()))?;
         if entry.crc32() != page.crc32 || entry.size() != page.size {
