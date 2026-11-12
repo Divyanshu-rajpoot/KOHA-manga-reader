@@ -9,14 +9,11 @@ use std::sync::{Arc, Mutex, RwLock, RwLockReadGuard, RwLockWriteGuard};
 use rayon::prelude::*;
 
 use crate::archive::{Archive, ArchiveRegistry};
-use crate::cache::pages::{dimensions, PageCache};
+use crate::cache::pages::PageCache;
 use crate::cache::{cache_key, ThumbCache};
 use crate::library::store::LibraryStore;
 use crate::library::Library;
 use crate::settings::Settings;
-
-/// Enough of a page to hold its image header, even with a large EXIF or colour profile.
-const HEADER_BYTES: usize = 64 * 1024;
 
 /// Width and height of every page of a volume. `(0, 0)` means unknown.
 pub type PageSizes = Arc<Vec<(u32, u32)>>;
@@ -108,8 +105,9 @@ impl AppState {
         Ok((archive, key))
     }
 
-    /// Page sizes for a volume, read from image headers only (no decoding),
-    /// so the long-strip layout is known before any page is shown.
+    /// Page sizes for a volume, read from image headers or the PDF page list
+    /// only (nothing is decoded or drawn), so the long-strip layout is known
+    /// before any page is shown.
     pub fn page_sizes(&self, volume_id: &str) -> Result<PageSizes, String> {
         let cached = |this: &Self| {
             this.page_sizes
@@ -122,17 +120,9 @@ impl AppState {
             return Ok(sizes);
         }
         let (archive, _) = self.open_volume(volume_id)?;
-        let sizes: Vec<(u32, u32)> = (0..archive.pages().len())
+        let sizes: Vec<(u32, u32)> = (0..archive.page_count())
             .into_par_iter()
-            .map(|index| {
-                archive
-                    .read_page_head(index, HEADER_BYTES)
-                    .ok()
-                    .and_then(|head| dimensions(&head))
-                    // The header did not fit in the first bytes: read the whole page.
-                    .or_else(|| archive.read_page(index).ok().and_then(|page| dimensions(&page)))
-                    .unwrap_or((0, 0))
-            })
+            .map(|index| archive.page_size(index).unwrap_or((0, 0)))
             .collect();
         let sizes = Arc::new(sizes);
         self.page_sizes

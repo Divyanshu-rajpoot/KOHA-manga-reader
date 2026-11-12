@@ -49,14 +49,14 @@ export interface Settings {
   defaultDirection: Direction;
   /** Where "Copy into KOMA library" puts files. */
   libraryFolder: string;
-  /** Folders checked for new archives. */
+  /** Folders checked for new CBZ and PDF files. */
   watchFolders: string[];
 }
 
-/** Archive details for one volume's file. */
+/** File details for one volume (a CBZ archive or a PDF). */
 export interface FileInfo {
   volumeId: string;
-  /** e.g. "ZIP64 · stored". Empty when the file is missing. */
+  /** e.g. "ZIP64 · stored" or "PDF · scans". Empty when the file is missing. */
   archive: string;
   openMs: number;
   missing: boolean;

@@ -40,6 +40,15 @@ pub fn mime_from_bytes(bytes: &[u8]) -> &'static str {
     }
 }
 
+/// Width and height from the image header, without decoding the pixels.
+pub fn dimensions(bytes: &[u8]) -> Option<(u32, u32)> {
+    image::ImageReader::new(std::io::Cursor::new(bytes))
+        .with_guessed_format()
+        .ok()?
+        .into_dimensions()
+        .ok()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

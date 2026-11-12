@@ -101,7 +101,7 @@ export class KomaApi {
     return invoke<void>('clear_thumb_cache');
   }
 
-  /** New archives found in the watched folders (not in the library yet). */
+  /** New CBZ and PDF files found in the watched folders (not in the library yet). */
   onWatchFound(handler: (paths: string[]) => void): Promise<UnlistenFn> {
     return listen<string[]>('watch-found', (event) => handler(event.payload));
   }
@@ -136,12 +136,12 @@ export class KomaApi {
 
   // --- import ---
 
-  /** File picker for archives. Returns [] if cancelled. */
+  /** File picker for CBZ, ZIP and PDF files. Returns [] if cancelled. */
   async pickFiles(): Promise<string[]> {
     const picked = await open({
       multiple: true,
       directory: false,
-      filters: [{ name: 'Comic archives', extensions: ['cbz', 'zip'] }],
+      filters: [{ name: 'Comics (CBZ, ZIP, PDF)', extensions: ['cbz', 'zip', 'pdf'] }],
     });
     return picked ?? [];
   }

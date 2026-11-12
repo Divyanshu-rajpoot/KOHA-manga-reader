@@ -1,7 +1,7 @@
 //! Disk cache for covers and page thumbnails.
 //!
 //! Files live in `%LOCALAPPDATA%\Koma\thumbs\{key}\`, where the key is a hash
-//! of the archive's path, size and modified time, so a changed file gets fresh
+//! of the file's path, size and modified time, so a changed file gets fresh
 //! images. Everything here can be deleted safely; it is rebuilt on demand.
 //!
 //! Images are JPEG rather than the WebP named in ARCHITECTURE.md: the `image`
@@ -37,7 +37,7 @@ fn fnv1a(parts: &[&[u8]]) -> u64 {
     hash
 }
 
-/// Cache key for an archive file.
+/// Cache key for a volume file (CBZ or PDF).
 pub fn cache_key(path: &str, size: u64, mtime: i64) -> String {
     let path = path.replace('/', "\\").to_lowercase();
     format!("{:016x}", fnv1a(&[path.as_bytes(), &size.to_le_bytes(), &mtime.to_le_bytes()]))
@@ -86,7 +86,7 @@ impl ThumbCache {
         self.root.join(key).join(format!("p{index:05}.jpg"))
     }
 
-    /// Makes the cover (the archive's first page) unless it is already cached.
+    /// Makes the cover (the volume's first page) unless it is already cached.
     pub fn ensure_cover(&self, archive: &Archive, key: &str) -> Result<PathBuf, String> {
         let path = self.cover_path(key);
         if !path.exists() {
@@ -113,9 +113,7 @@ fn render(
     max_height: u32,
     quality: u8,
 ) -> Result<(), String> {
-    let bytes = archive.read_page(index).map_err(|err| err.to_string())?;
-    let image = image::load_from_memory(&bytes).map_err(|err| format!("could not decode page {index}: {err}"))?;
-    drop(bytes);
+    let image = archive.page_preview(index, max_width, max_height).map_err(|err| err.to_string())?;
     let image = if image.width() > max_width || image.height() > max_height {
         image.thumbnail(max_width, max_height)
     } else {

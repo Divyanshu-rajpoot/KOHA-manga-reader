@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "KOMA",
-  "version": "0.1.0",
+  "version": "1.0.2",
   "identifier": "app.koma.reader",
   "build": {
     "frontendDist": "../dist/koma/browser",
@@ -34,7 +34,12 @@
     "targets": ["nsis", "msi"],
     "category": "Entertainment",
     "shortDescription": "Offline manga and manhwa reader",
-    "longDescription": "KOMA is a fast, offline reader for CBZ manga and manhwa. No accounts, no internet, no telemetry.",
+    "longDescription": "KOMA is a fast, offline reader for CBZ and PDF manga and manhwa. No accounts, no internet, no telemetry.",
+    "resources": {
+      "pdfium/pdfium.dll": "pdfium.dll",
+      "pdfium/LICENSE": "licenses/pdfium/LICENSE",
+      "pdfium/licenses/": "licenses/pdfium/third-party/"
+    },
     "windows": {
       "nsis": {
         "installerIcon": "icons/icon.ico",

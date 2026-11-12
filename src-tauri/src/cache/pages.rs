@@ -6,17 +6,16 @@
 //! prepared ahead of time on the rayon pool.
 
 use std::collections::HashMap;
-use std::io::Cursor;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard, OnceLock};
 
 use fast_image_resize::images::Image;
 use fast_image_resize::{PixelType, Resizer};
 use image::codecs::jpeg::JpegEncoder;
-use image::{DynamicImage, ExtendedColorType, ImageReader};
+use image::{DynamicImage, ExtendedColorType};
 use lru::LruCache;
 
-use crate::archive::{mime_from_bytes, Archive};
+use crate::archive::{dimensions, mime_from_bytes, Archive};
 
 #[cfg(test)]
 pub const DEFAULT_CAPACITY_BYTES: usize = 1 << 30;
@@ -139,7 +138,7 @@ impl PageCache {
     /// Records the page being read and prepares its neighbours in the background.
     pub fn preload_around(self: &Arc<Self>, archive: &Arc<Archive>, volume_id: &str, index: usize, width: Option<u32>) {
         self.lock().focus = (volume_id.to_string(), index);
-        let pages = archive.pages().len();
+        let pages = archive.page_count();
         let ahead = self.preload_ahead.load(Ordering::Relaxed);
         let behind = self.preload_behind.load(Ordering::Relaxed);
         // A preload is dropped if the reader has moved further than this from it.
@@ -182,15 +181,6 @@ impl PageCache {
         pages
     }
 
-}
-
-/// Width and height from the image header, without decoding the pixels.
-pub fn dimensions(bytes: &[u8]) -> Option<(u32, u32)> {
-    ImageReader::new(Cursor::new(bytes))
-        .with_guessed_format()
-        .ok()?
-        .into_dimensions()
-        .ok()
 }
 
 fn render(archive: &Archive, index: usize, width: Option<u32>) -> Result<CachedPage, String> {
@@ -248,7 +238,7 @@ fn resize_to_jpeg(bytes: &[u8], width: u32, height: u32) -> Option<Vec<u8>> {
 #[cfg(test)]
 mod tests {
     use std::fs::File;
-    use std::io::Write;
+    use std::io::{Cursor, Write};
     use std::time::{Duration, Instant};
 
     use zip::write::SimpleFileOptions;

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { KomaApi } from '../../core/koma-api';
 
-/** A volume's cover: the first page of its archive, in a 3:4.3 ink frame. */
+/** A volume's cover: the first page of its CBZ or PDF, in a 3:4.3 ink frame. */
 @Component({
   selector: 'koma-cover',
   changeDetection: ChangeDetectionStrategy.OnPush,

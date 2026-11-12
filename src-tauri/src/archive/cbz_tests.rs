@@ -1,4 +1,4 @@
-//! Archive engine tests. CBZ files are generated in the temp folder and removed afterwards.
+//! CBZ engine tests. CBZ files are generated in the temp folder and removed afterwards.
 //!
 //! The multi-GB benchmark is ignored by default:
 //! `cargo test --release -- --ignored --nocapture`
@@ -11,7 +11,8 @@ use std::time::Instant;
 use zip::write::SimpleFileOptions;
 use zip::{CompressionMethod, ZipWriter};
 
-use super::{mime_from_bytes, Archive, ArchiveError};
+use super::CbzArchive as Archive;
+use crate::archive::{mime_from_bytes, ArchiveError};
 
 /// A temp CBZ that deletes itself.
 struct TempCbz(PathBuf);

@@ -1,6 +1,6 @@
 <header>
   <h1>Import volumes</h1>
-  <p>Add CBZ files or a whole folder. Nothing is uploaded; KOMA only reads the files on your PC.</p>
+  <p>Add CBZ or PDF files, or a whole folder. Nothing is uploaded; KOMA only reads the files on your PC.</p>
 </header>
 
 @if (!inTauri) {
@@ -28,8 +28,8 @@
         <rect class="sheet" x="18" y="12" width="26" height="34" />
         <path d="M31 52V26M22 35l9-9 9 9M12 50v10h38V50" />
       </svg>
-      <h2>{{ dragOver() ? 'Drop to add' : 'Drop CBZ files or a folder' }}</h2>
-      <p>CBZ · ZIP · folders are searched for archives · files of any size</p>
+      <h2>{{ dragOver() ? 'Drop to add' : 'Drop CBZ or PDF files, or a folder' }}</h2>
+      <p>CBZ · ZIP · PDF · folders are searched for all three · files of any size</p>
       <div class="buttons">
         <button type="button" class="btn" (click)="chooseFiles()" [disabled]="!inTauri || scanning()">
           Choose files
@@ -46,7 +46,7 @@
     <p class="rule mono">
       Series detection: <b>&#123;Series&#125; v&#123;NN&#125;.cbz</b> ·
       <b>&#123;Series&#125; Vol &#123;N&#125;.cbz</b> · <b>&#123;Series&#125; &#123;NN&#125;-&#123;NN&#125;.cbz</b> ·
-      <b>&#123;Series&#125; c&#123;NNN&#125;.cbz</b>. A ComicInfo.xml inside the archive overrides the file name.
+      <b>&#123;Series&#125; c&#123;NNN&#125;.pdf</b>. The same names work for CBZ, ZIP and PDF. A ComicInfo.xml inside a CBZ overrides the file name.
     </p>
 
     <div class="options" role="group" aria-label="Where to keep imported files">
@@ -68,7 +68,7 @@
         (click)="storage.set('copied')"
       >
         <b>Copy into KOMA library folder</b>
-        <small>One tidy folder: Series\Vol NN.cbz</small>
+        <small>One tidy folder: Series\Vol NN.cbz (or .pdf)</small>
         @if (libraryFolder()) {
           <small class="mono folder">{{ libraryFolder() }}</small>
         }

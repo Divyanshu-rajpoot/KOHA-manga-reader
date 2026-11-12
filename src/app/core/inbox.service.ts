@@ -13,7 +13,7 @@ export class ImportInbox {
 
   /** Paths the Import screen should scan next. It empties this when it takes them. */
   readonly pending = signal<string[]>([]);
-  /** New archives sitting in the watched folders. */
+  /** New CBZ and PDF files sitting in the watched folders. */
   readonly watchFound = signal<string[]>([]);
   /** Files are being dragged over the window. */
   readonly dragging = signal(false);

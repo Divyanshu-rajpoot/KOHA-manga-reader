@@ -1,7 +1,7 @@
 //! Import: scan files or folders into candidates, then add them to the library.
 //!
-//! Scanning only reads each archive's index (and ComicInfo.xml), so it is fast
-//! at any file size. Adding a volume optionally copies the file, makes its
+//! Scanning only reads each file's index (and ComicInfo.xml), so it is fast
+//! at any file size. CBZ, ZIP and PDF files are all volumes. Adding a volume optionally copies the file, makes its
 //! cover, saves the library, then makes page thumbnails in parallel.
 
 #[cfg(test)]
@@ -23,7 +23,7 @@ use crate::library::parser::parse_file_name;
 use crate::library::{Direction, Library, SeriesType, Storage, Unit, Volume};
 use crate::state::AppState;
 
-const ARCHIVE_EXTENSIONS: [&str; 2] = ["cbz", "zip"];
+const ARCHIVE_EXTENSIONS: [&str; 3] = ["cbz", "zip", "pdf"];
 const COPY_CHUNK: usize = 4 * 1024 * 1024;
 
 /// A file found by a scan, with KOMA's best guess at what it is.
@@ -155,9 +155,9 @@ fn scan_one(path: &Path, library: &Library, default_direction: Direction) -> Can
         }
     };
     candidate.index_ms = started.elapsed().as_secs_f64() * 1000.0;
-    candidate.pages = archive.pages().len();
+    candidate.pages = archive.page_count();
     if candidate.pages == 0 {
-        candidate.error = Some("no page images in this archive".into());
+        candidate.error = Some("no pages in this file".into());
         return candidate;
     }
 
@@ -227,7 +227,12 @@ fn sanitize_file_name(name: &str) -> String {
 }
 
 /// `{library}\{Series}\Vol NN.cbz` (or `Ch NNN.cbz`, `Vol 01-05.cbz`).
+/// A PDF keeps its extension; every other archive is filed as `.cbz`.
 pub fn library_destination(library_folder: &Path, item: &ImportItem) -> PathBuf {
+    let is_pdf = Path::new(&item.path)
+        .extension()
+        .is_some_and(|ext| ext.eq_ignore_ascii_case("pdf"));
+    let extension = if is_pdf { "pdf" } else { "cbz" };
     let label = match item.unit {
         Unit::Volume => "Vol",
         Unit::Chapter => "Ch",
@@ -239,7 +244,7 @@ pub fn library_destination(library_folder: &Path, item: &ImportItem) -> PathBuf 
     }
     library_folder
         .join(sanitize_file_name(&item.series))
-        .join(format!("{name}.cbz"))
+        .join(format!("{name}.{extension}"))
 }
 
 fn copy_with_progress(source: &Path, dest: &Path, report: &mut dyn FnMut(u64, u64)) -> io::Result<()> {
@@ -247,7 +252,9 @@ fn copy_with_progress(source: &Path, dest: &Path, report: &mut dyn FnMut(u64, u6
         fs::create_dir_all(parent)?;
     }
     let total = fs::metadata(source)?.len();
-    let partial = dest.with_extension("cbz.part");
+    let mut partial = dest.as_os_str().to_owned();
+    partial.push(".part");
+    let partial = PathBuf::from(partial);
     let result = (|| {
         let mut reader = File::open(source)?;
         let mut writer = File::create(&partial)?;
@@ -327,9 +334,9 @@ pub fn import_one(
         .archives
         .get_or_open(&volume_id, &path)
         .map_err(|err| err.to_string())?;
-    let pages = archive.pages().len();
+    let pages = archive.page_count();
     if pages == 0 {
-        return Err("no page images in this archive".into());
+        return Err("no pages in this file".into());
     }
     emit("index", 1, 1, None);
 

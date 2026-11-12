@@ -83,7 +83,7 @@
   <div class="row">
     <div class="what">
       <b>Pages loaded ahead</b>
-      <small>Read from the archive before you reach them, so page turns are instant.</small>
+      <small>Read from the file before you reach them, so page turns are instant.</small>
     </div>
     <div class="stepper" role="group" aria-label="Pages loaded ahead">
       <button type="button" aria-label="Fewer" [disabled]="s.preloadAhead <= 0" (click)="step('preloadAhead', -1)">−</button>
@@ -162,7 +162,7 @@
   <div class="row top">
     <div class="what">
       <b>Watched folders</b>
-      <small>New CBZ files that appear here are offered on the Import screen. Nothing is added by itself.</small>
+      <small>New CBZ and PDF files that appear here are offered on the Import screen. Nothing is added by itself.</small>
       @for (folder of s.watchFolders; track folder) {
         <span class="mono path watched">
           {{ folder }}

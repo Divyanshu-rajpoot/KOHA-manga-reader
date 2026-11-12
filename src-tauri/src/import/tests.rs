@@ -7,7 +7,7 @@ use zip::write::SimpleFileOptions;
 use zip::{CompressionMethod, ZipWriter};
 
 use super::*;
-use crate::testutil::TempDir;
+use crate::testutil::{test_jpeg, write_pdf, PdfTestPage, TempDir};
 
 /// A real, decodable JPEG page.
 fn jpeg(width: u32, height: u32, shade: u8) -> Vec<u8> {
@@ -240,6 +240,50 @@ fn names_library_files() {
     assert_eq!(library_destination(root, &base), root.join("Paper Ronin").join("Vol 07.cbz"));
     let chapter = ImportItem { unit: Unit::Chapter, number: 12.5, ..base.clone() };
     assert_eq!(library_destination(root, &chapter), root.join("Paper Ronin").join("Ch 12.5.cbz"));
-    let blank = ImportItem { series: " .. ".into(), ..base };
+    let blank = ImportItem { series: " .. ".into(), ..base.clone() };
     assert_eq!(library_destination(root, &blank), root.join("Untitled").join("Vol 07.cbz"));
+    // A ZIP is filed as CBZ; a PDF stays a PDF.
+    let zip = ImportItem { path: "D:/in/Paper Ronin v07.zip".into(), ..base.clone() };
+    assert_eq!(library_destination(root, &zip), root.join("Paper Ronin").join("Vol 07.cbz"));
+    let pdf = ImportItem { path: "D:/in/Paper Ronin v07.PDF".into(), ..base };
+    assert_eq!(library_destination(root, &pdf), root.join("Paper Ronin").join("Vol 07.pdf"));
+}
+
+#[test]
+fn imports_a_pdf_chapter_into_the_library_folder() {
+    let fx = Fixture::new("pdf");
+    let path = fx.source("Tidebreaker/Tidebreaker c012.pdf");
+    write_pdf(
+        &path,
+        &[
+            PdfTestPage::Jpeg { bytes: test_jpeg(720, 2400, 30), width: 720, height: 2400 },
+            PdfTestPage::Vector,
+        ],
+    );
+
+    // A folder scan finds PDFs next to archives.
+    let candidate = fx.scan(&[&fx.source("Tidebreaker")]).remove(0);
+    assert_eq!(candidate.error, None);
+    assert_eq!((candidate.series.as_str(), candidate.number, candidate.pages), ("Tidebreaker", Some(12.0), 2));
+    assert_eq!((candidate.unit, candidate.series_type), (Unit::Chapter, SeriesType::Manhwa));
+    assert!(candidate.matched);
+
+    let volume_id = import_one(&fx.state, &item(&candidate), Storage::Copied, &|_| {}).unwrap();
+    let expected = fx.dir.path().join("KOMA Library").join("Tidebreaker").join("Ch 12.pdf");
+    {
+        let library = fx.state.library();
+        let volume = library.volume(&volume_id).unwrap();
+        assert_eq!(Path::new(&volume.path), expected);
+        assert_eq!(volume.pages, 2);
+    }
+    assert_eq!(fs::read(&expected).unwrap(), fs::read(&path).unwrap());
+
+    // Cover and thumbnails for both kinds of page; sizes for the long strip.
+    let (_, key) = fx.state.open_volume(&volume_id).unwrap();
+    assert_eq!(image::open(fx.state.thumbs.cover_path(&key)).unwrap().width(), 480);
+    for index in 0..2 {
+        let thumb = image::open(fx.state.thumbs.thumb_path(&key, index)).unwrap();
+        assert!(thumb.width() <= 200 && thumb.height() <= 400);
+    }
+    assert_eq!(*fx.state.page_sizes(&volume_id).unwrap(), vec![(720, 2400), (833, 1111)]);
 }

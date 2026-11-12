@@ -113,7 +113,7 @@ export class Import {
     try {
       const candidates = await this.api.scanImport(paths);
       if (candidates.length === 0) {
-        this.error.set('No CBZ or ZIP files were found there.');
+        this.error.set('No CBZ, ZIP or PDF files were found there.');
         return;
       }
       this.rows.update((rows) => {

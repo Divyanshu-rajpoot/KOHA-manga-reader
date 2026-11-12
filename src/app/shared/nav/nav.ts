@@ -60,7 +60,7 @@ const THEME_ORDER: Settings['theme'][] = ['system', 'light', 'dark'];
 
     <a class="btn acc" routerLink="/import">
       <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12" /></svg>
-      Add CBZ
+      Add files
     </a>
   `,
   styles: `
