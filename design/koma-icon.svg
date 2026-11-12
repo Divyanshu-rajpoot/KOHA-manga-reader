@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- KOMA mark: the nav logo (accent square with a katakana "ko") plus the
+       hard offset shadow from docs/DESIGN.md. Source for `npx tauri icon`. -->
+  <rect x="136" y="136" width="824" height="824" fill="#0e0e0e"/>
+  <rect x="64" y="64" width="824" height="824" fill="#e3242b"/>
+  <path d="M262 300H636V652H262" fill="none" stroke="#ffffff" stroke-width="112" stroke-linecap="butt" stroke-linejoin="miter"/>
+</svg>

@@ -26,6 +26,8 @@ const FLAG_ENCRYPTED: u16 = 1;
 /// Largest single page we are willing to hold in memory.
 const MAX_PAGE_BYTES: u64 = 1 << 30;
 const MAX_COMIC_INFO_BYTES: u64 = 1 << 20;
+/// Memory reserved up front for a deflated page; it grows only as real data arrives.
+const MAX_INFLATE_PREALLOC: usize = 64 << 20;
 
 #[derive(Debug)]
 pub enum ArchiveError {
@@ -252,11 +254,15 @@ impl Archive {
         }
         let name_len = u16::from_le_bytes([header[26], header[27]]) as u64;
         let extra_len = u16::from_le_bytes([header[28], header[29]]) as u64;
-        let data_offset = page.header_offset + LOCAL_HEADER_LEN as u64 + name_len + extra_len;
-        if data_offset + page.compressed_size > self.file_size {
-            return Err(ArchiveError::Invalid(format!("{} runs past the end of the file", page.name)));
-        }
-        Ok(data_offset)
+        // Checked: offsets and sizes come from the file and may be corrupt.
+        page.header_offset
+            .checked_add(LOCAL_HEADER_LEN as u64 + name_len + extra_len)
+            .filter(|offset| {
+                offset
+                    .checked_add(page.compressed_size)
+                    .is_some_and(|end| end <= self.file_size)
+            })
+            .ok_or_else(|| ArchiveError::Invalid(format!("{} runs past the end of the file", page.name)))
     }
 
     /// Deflated pages are streamed through the `zip` crate's decoder.
@@ -278,8 +284,13 @@ impl Archive {
         if entry.crc32() != page.crc32 || entry.size() != page.size {
             return Err(ArchiveError::Invalid(format!("index mismatch for {}", page.name)));
         }
-        let mut data = Vec::with_capacity(page.size as usize);
-        entry.read_to_end(&mut data)?;
+        // Never inflate more than the index promised (a "zip bomb" entry lies
+        // about its size), and do not trust that size for the first allocation.
+        let mut data = Vec::with_capacity((page.size as usize).min(MAX_INFLATE_PREALLOC));
+        entry.take(page.size + 1).read_to_end(&mut data)?;
+        if data.len() as u64 != page.size {
+            return Err(ArchiveError::Invalid(format!("{} is not the size the index says", page.name)));
+        }
         Ok(data)
     }
 }

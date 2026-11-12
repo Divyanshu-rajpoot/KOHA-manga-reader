@@ -141,7 +141,7 @@ fn decode_name(bytes: &[u8]) -> String {
 /// Also says whether the archive uses ZIP64 records.
 pub fn read_central_directory(file: &File, file_len: u64) -> Result<(Vec<RawEntry>, bool)> {
     let dir = locate_directory(file, file_len)?;
-    if dir.size > MAX_CENTRAL_DIR_LEN || dir.start + dir.size > file_len {
+    if dir.size > MAX_CENTRAL_DIR_LEN || dir.start.checked_add(dir.size).is_none_or(|end| end > file_len) {
         return Err(invalid("central directory size is not plausible"));
     }
 
@@ -208,7 +208,10 @@ pub fn read_central_directory(file: &File, file_len: u64) -> Result<(Vec<RawEntr
             crc32,
             compressed_size,
             uncompressed_size,
-            header_offset: header_offset + dir.base,
+            // A corrupt 64-bit offset must not overflow.
+            header_offset: header_offset
+                .checked_add(dir.base)
+                .ok_or_else(|| invalid("entry offset is outside the file"))?,
             cd_index: entries.len(),
         });
         pos = next;

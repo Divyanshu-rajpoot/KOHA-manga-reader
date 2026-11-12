@@ -84,13 +84,19 @@ fn is_archive(path: &Path) -> bool {
         .is_some_and(|ext| ARCHIVE_EXTENSIONS.iter().any(|known| ext.eq_ignore_ascii_case(known)))
 }
 
-fn collect(path: &Path, out: &mut Vec<PathBuf>) {
+/// Folders nested deeper than this are not scanned (guards against link loops).
+const MAX_SCAN_DEPTH: usize = 32;
+
+fn collect(path: &Path, depth: usize, out: &mut Vec<PathBuf>) {
     if path.is_dir() {
+        if depth >= MAX_SCAN_DEPTH {
+            return;
+        }
         let Ok(entries) = fs::read_dir(path) else {
             return;
         };
         for entry in entries.flatten() {
-            collect(&entry.path(), out);
+            collect(&entry.path(), depth + 1, out);
         }
     } else if is_archive(path) {
         out.push(path.to_path_buf());
@@ -101,7 +107,7 @@ fn collect(path: &Path, out: &mut Vec<PathBuf>) {
 pub fn expand_paths(paths: &[String]) -> Vec<PathBuf> {
     let mut out = Vec::new();
     for path in paths {
-        collect(Path::new(path), &mut out);
+        collect(Path::new(path), 0, &mut out);
     }
     out.sort_by(|a, b| natord::compare_ignore_case(&a.to_string_lossy(), &b.to_string_lossy()));
     out.dedup();
