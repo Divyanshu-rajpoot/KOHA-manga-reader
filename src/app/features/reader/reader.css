@@ -1,0 +1,208 @@
+/* The reader has no animations or transitions: nothing moves while reading. */
+:host {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100%;
+  overflow: hidden;
+  background: var(--reader-bg);
+  color: var(--text);
+}
+
+.top {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 22px 10px;
+}
+.group {
+  position: relative;
+  display: flex;
+  gap: 8px;
+}
+.group.end {
+  justify-content: flex-end;
+}
+.box {
+  min-width: 44px;
+  height: 44px;
+  padding: 0 12px;
+  border: var(--border-control) solid var(--ink);
+  background: transparent;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.box:hover {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+.box[aria-pressed='true'] {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: var(--on-acc);
+}
+.box svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  vertical-align: middle;
+}
+
+.heading {
+  min-width: 0;
+  text-align: center;
+}
+.heading h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 1px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.heading p {
+  margin: 2px 0 0;
+  color: var(--muted);
+}
+
+.menu {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  width: 290px;
+  padding: 6px;
+  border: var(--border-panel) solid var(--ink);
+  background: var(--panel);
+  box-shadow: 8px 8px 0 var(--acc);
+}
+.menu button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  text-align: left;
+}
+.menu button:hover {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+.menu span {
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.menu p {
+  margin: 6px 0 0;
+  padding: 8px 10px 4px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  line-height: 1.7;
+}
+
+.stage {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+  min-width: 0;
+}
+.message {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.end-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(520px, calc(100% - 48px));
+  padding: 26px 28px;
+  border: var(--border-panel) solid var(--ink);
+  background: var(--panel);
+  box-shadow: 10px 10px 0 var(--acc);
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+.end-card p {
+  margin: 0;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+.end-card h2 {
+  margin: 4px 0 18px;
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.caught-up {
+  flex-basis: 100%;
+  color: var(--acc) !important;
+}
+.end-card .btn {
+  transition: none;
+}
+
+koma-thumb-strip {
+  position: relative;
+  z-index: 2;
+}
+
+/*
+ * Full screen: the page takes the entire screen. The top bar and thumbnail
+ * strip float over it and appear only when the pointer nears that edge.
+ */
+:host(.immersive) {
+  display: block;
+}
+:host(.immersive) .stage {
+  position: absolute;
+  inset: 0;
+}
+:host(.immersive) .top,
+:host(.immersive) koma-thumb-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: color-mix(in srgb, var(--reader-bg) 94%, transparent);
+  visibility: hidden;
+}
+:host(.immersive) .top {
+  top: 0;
+}
+:host(.immersive) koma-thumb-strip {
+  bottom: 0;
+}
+:host(.immersive.show-top) .top,
+:host(.immersive.show-bottom) koma-thumb-strip,
+:host(.immersive) .top:focus-within,
+:host(.immersive) koma-thumb-strip:focus-within {
+  visibility: visible;
+}

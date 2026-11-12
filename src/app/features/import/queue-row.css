@@ -1,0 +1,141 @@
+:host {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: var(--border-control) solid var(--ink);
+  background: var(--panel);
+  animation: rise-in var(--t-ui) var(--ease) both;
+}
+
+.cover {
+  width: 40px;
+  aspect-ratio: 3 / 4.3;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--on-ink);
+  font-family: var(--font-display);
+  font-size: 16px;
+}
+.cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.body {
+  min-width: 0;
+}
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.file {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.size {
+  font-size: 11px;
+  color: var(--muted);
+}
+.remove {
+  border: 0;
+  background: transparent;
+  padding: 0 2px;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--muted);
+}
+.remove:hover {
+  color: var(--acc);
+}
+
+.match {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 6px;
+  font-size: 12px;
+}
+:host(.flagged) .match {
+  color: var(--acc);
+}
+.tag {
+  padding: 0 5px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+.edit {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-decoration: underline;
+}
+.edit:hover {
+  color: var(--text);
+}
+
+.editor {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.editor input,
+.editor select {
+  height: 32px;
+  padding: 0 8px;
+  border: var(--border-control) solid var(--ink);
+  border-radius: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  user-select: text;
+}
+.editor input:first-child {
+  flex: 1;
+  min-width: 0;
+}
+.editor .number {
+  width: 72px;
+}
+
+.bar {
+  height: 4px;
+  background: color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--acc);
+  transition: width var(--t-ui) var(--ease);
+}
+
+.steps {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.steps .on {
+  color: var(--text);
+}
+.pages {
+  margin-left: auto;
+  font-size: 10px;
+}

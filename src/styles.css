@@ -1,0 +1,157 @@
+@import './styles/tokens.css';
+@import './styles/fonts.css';
+@import './styles/textures.css';
+@import './styles/motion.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.4;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  cursor: default;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+a {
+  color: inherit;
+}
+
+/* Screen titles: Anton, uppercase. */
+.display {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 58px;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* Chips and filters. See docs/DESIGN.md §4. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 11px;
+  border: var(--border-control) solid var(--ink);
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+}
+.chip.on,
+.chip[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+/* Two or more choices in one ink box. */
+.seg {
+  display: inline-flex;
+  padding: 3px;
+  border: var(--border-control) solid var(--ink);
+}
+.seg button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  font-size: 12px;
+}
+.seg button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.empty-note {
+  margin: 0;
+  padding: 14px;
+  border: var(--border-control) dashed var(--ink);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Lists stagger in at 50 ms per item: set --i on each item. */
+.stagger {
+  animation: rise-in var(--t-ui) var(--ease) both;
+  animation-delay: calc(min(var(--i, 0), 24) * 50ms);
+}
+
+/* Buttons. See docs/DESIGN.md §4. */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+.btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border: var(--border-control) solid var(--ink);
+  border-radius: 0;
+  background: var(--ink);
+  color: var(--on-ink);
+  font-weight: 700;
+  font-size: 14px;
+  transition:
+    transform var(--t-micro) var(--ease),
+    box-shadow var(--t-micro) var(--ease);
+}
+.btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--acc);
+}
+.btn:active {
+  transform: none;
+  box-shadow: none;
+}
+.btn.acc {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: var(--on-acc);
+}
+.btn.acc:hover {
+  box-shadow: 5px 5px 0 var(--ink);
+}
+.btn.out {
+  background: transparent;
+  color: var(--text);
+}

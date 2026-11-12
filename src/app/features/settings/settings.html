@@ -1,0 +1,189 @@
+<header>
+  <h1 class="display">Settings</h1>
+  <p class="mono summary">SAVED AS YOU CHANGE THEM · EVERYTHING STAYS ON THIS PC</p>
+</header>
+
+@if (!inTauri) {
+  <p class="notice mono">Settings are saved by the desktop app. Run: npm run tauri dev</p>
+}
+@if (error(); as message) {
+  <p class="notice error mono" role="alert">{{ message }}</p>
+}
+
+@let s = settings();
+
+<section>
+  <h2>Appearance</h2>
+
+  <div class="row">
+    <div class="what">
+      <b>Theme</b>
+      <small>System follows the Windows light or dark setting.</small>
+    </div>
+    <div class="seg" role="group" aria-label="Theme">
+      <button type="button" [attr.aria-pressed]="s.theme === 'system'" (click)="set({ theme: 'system' })">System</button>
+      <button type="button" [attr.aria-pressed]="s.theme === 'light'" (click)="set({ theme: 'light' })">Paper</button>
+      <button type="button" [attr.aria-pressed]="s.theme === 'dark'" (click)="set({ theme: 'dark' })">Ink</button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="what">
+      <b>Accent</b>
+      <small>The one colour used for shadows, progress and stamps.</small>
+    </div>
+    <div class="seg" role="group" aria-label="Accent colour">
+      <button type="button" [attr.aria-pressed]="s.accent === 'red'" (click)="set({ accent: 'red' })">
+        <i class="swatch red" aria-hidden="true"></i>Red
+      </button>
+      <button type="button" [attr.aria-pressed]="s.accent === 'orange'" (click)="set({ accent: 'orange' })">
+        <i class="swatch orange" aria-hidden="true"></i>Archive orange
+      </button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="what">
+      <b>Reduce motion</b>
+      <small>Stops the carousel turning by itself, the spinning bursts and other animation.</small>
+    </div>
+    <div class="seg" role="group" aria-label="Reduce motion">
+      <button type="button" [attr.aria-pressed]="!s.reduceMotion" (click)="set({ reduceMotion: false })">Off</button>
+      <button type="button" [attr.aria-pressed]="s.reduceMotion" (click)="set({ reduceMotion: true })">On</button>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Reading</h2>
+
+  <div class="row">
+    <div class="what">
+      <b>Default reading direction</b>
+      <small>Given to newly imported series. Change one series from its own page.</small>
+    </div>
+    <div class="seg" role="group" aria-label="Default reading direction">
+      <button
+        type="button"
+        [attr.aria-pressed]="s.defaultDirection === 'rtl'"
+        (click)="set({ defaultDirection: 'rtl' })"
+      >
+        Right to left
+      </button>
+      <button
+        type="button"
+        [attr.aria-pressed]="s.defaultDirection === 'ltr'"
+        (click)="set({ defaultDirection: 'ltr' })"
+      >
+        Left to right
+      </button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="what">
+      <b>Pages loaded ahead</b>
+      <small>Read from the archive before you reach them, so page turns are instant.</small>
+    </div>
+    <div class="stepper" role="group" aria-label="Pages loaded ahead">
+      <button type="button" aria-label="Fewer" [disabled]="s.preloadAhead <= 0" (click)="step('preloadAhead', -1)">−</button>
+      <output class="mono">{{ s.preloadAhead }}</output>
+      <button
+        type="button"
+        aria-label="More"
+        [disabled]="s.preloadAhead >= maxAhead"
+        (click)="step('preloadAhead', 1)"
+      >
+        +
+      </button>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="what">
+      <b>Pages kept behind</b>
+      <small>Kept ready for when you turn back.</small>
+    </div>
+    <div class="stepper" role="group" aria-label="Pages kept behind">
+      <button type="button" aria-label="Fewer" [disabled]="s.preloadBehind <= 0" (click)="step('preloadBehind', -1)">−</button>
+      <output class="mono">{{ s.preloadBehind }}</output>
+      <button
+        type="button"
+        aria-label="More"
+        [disabled]="s.preloadBehind >= maxBehind"
+        (click)="step('preloadBehind', 1)"
+      >
+        +
+      </button>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Cache</h2>
+
+  <div class="row">
+    <div class="what">
+      <b>Page memory</b>
+      <small>The most RAM used for ready-to-show pages. In use now: {{ pageSize() }}.</small>
+    </div>
+    <div class="seg" role="group" aria-label="Page memory">
+      @for (mb of cacheSizes; track mb) {
+        <button type="button" [attr.aria-pressed]="s.cacheMb === mb" (click)="set({ cacheMb: mb })">
+          {{ cacheLabel(mb) }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="what">
+      <b>Covers and thumbnails</b>
+      <small>On disk: {{ thumbSize() }}. They are made again when next shown.</small>
+    </div>
+    <button type="button" class="btn out" [disabled]="!inTauri || clearing()" (click)="clearThumbs()">
+      {{ clearing() ? 'Clearing…' : 'Clear cache' }}
+    </button>
+  </div>
+</section>
+
+<section>
+  <h2>Folders</h2>
+
+  <div class="row">
+    <div class="what">
+      <b>KOMA library folder</b>
+      <small>Where “Copy into KOMA library” puts files. Files already copied are not moved.</small>
+      <span class="mono path">{{ s.libraryFolder || '—' }}</span>
+    </div>
+    <button type="button" class="btn out" [disabled]="!inTauri" (click)="chooseLibraryFolder()">Change…</button>
+  </div>
+
+  <div class="row top">
+    <div class="what">
+      <b>Watched folders</b>
+      <small>New CBZ files that appear here are offered on the Import screen. Nothing is added by itself.</small>
+      @for (folder of s.watchFolders; track folder) {
+        <span class="mono path watched">
+          {{ folder }}
+          <button type="button" [attr.aria-label]="'Stop watching ' + folder" (click)="removeWatchFolder(folder)">
+            REMOVE
+          </button>
+        </span>
+      } @empty {
+        <span class="mono path">NO FOLDERS WATCHED</span>
+      }
+    </div>
+    <button type="button" class="btn out" [disabled]="!inTauri" (click)="addWatchFolder()">Add folder…</button>
+  </div>
+
+  @if (dataFolder()) {
+    <div class="row">
+      <div class="what">
+        <b>Library data</b>
+        <small>library.json and settings.json are kept here.</small>
+        <span class="mono path">{{ dataFolder() }}</span>
+      </div>
+    </div>
+  }
+</section>

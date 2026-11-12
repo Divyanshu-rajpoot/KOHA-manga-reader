@@ -1,0 +1,160 @@
+@if (view(); as v) {
+  <section class="head">
+    <a class="cover" [routerLink]="['/read', v.resume.id]" [attr.aria-label]="v.resumeLabel">
+      <koma-cover [volumeId]="v.resume.id" [badge]="v.badge" [lazy]="false" />
+    </a>
+
+    <div class="about">
+      <p class="mono source">{{ v.source }}</p>
+
+      @if (draft(); as d) {
+        <form class="edit" (submit)="$event.preventDefault(); saveEdit()">
+          <label>
+            <span class="mono">TITLE</span>
+            <input #title type="text" [value]="d.title" (input)="patchDraft({ title: title.value })" required />
+          </label>
+          <label>
+            <span class="mono">JAPANESE / ORIGINAL TITLE (OPTIONAL)</span>
+            <input #jp type="text" class="jp" [value]="d.titleJp" (input)="patchDraft({ titleJp: jp.value })" />
+          </label>
+          <div class="choices">
+            <div class="seg" role="group" aria-label="Type">
+              <button type="button" [attr.aria-pressed]="d.type === 'manga'" (click)="patchDraft({ type: 'manga' })">
+                Manga
+              </button>
+              <button type="button" [attr.aria-pressed]="d.type === 'manhwa'" (click)="patchDraft({ type: 'manhwa' })">
+                Manhwa
+              </button>
+            </div>
+            <div class="seg" role="group" aria-label="Reading direction">
+              <button
+                type="button"
+                [attr.aria-pressed]="d.direction === 'rtl'"
+                (click)="patchDraft({ direction: 'rtl' })"
+              >
+                Right to left
+              </button>
+              <button
+                type="button"
+                [attr.aria-pressed]="d.direction === 'ltr'"
+                (click)="patchDraft({ direction: 'ltr' })"
+              >
+                Left to right
+              </button>
+            </div>
+          </div>
+          <p class="hint">Using the title of another series merges this one into it.</p>
+          <div class="actions">
+            <button type="submit" class="btn acc" [disabled]="d.title.trim() === ''">Save</button>
+            <button type="button" class="btn out" (click)="draft.set(null)">Cancel</button>
+          </div>
+        </form>
+      } @else {
+        <h1 class="display">{{ v.series.title }}</h1>
+        @if (v.series.titleJp) {
+          <p class="jp">{{ v.series.titleJp }}</p>
+        }
+        <div class="chips">
+          @for (chip of v.chips; track chip) {
+            <span class="chip">{{ chip }}</span>
+          }
+        </div>
+
+        <dl class="stats">
+          @for (stat of v.stats; track stat.label) {
+            <div>
+              <dt>{{ stat.label }}</dt>
+              <dd>{{ stat.value }}</dd>
+            </div>
+          }
+        </dl>
+
+        <div class="actions">
+          <a class="btn acc" [routerLink]="['/read', v.resume.id]">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" /></svg>
+            {{ v.resumeLabel }}
+          </a>
+          <a class="btn out" routerLink="/import">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12" /></svg>
+            Add volumes
+          </a>
+          <button type="button" class="btn out" (click)="startEdit()">Edit</button>
+          @if (confirmRemove()) {
+            <span class="confirm mono">
+              REMOVE FROM LIBRARY? FILES STAY ON DISK.
+              <button type="button" class="chip danger" (click)="removeSeries()">REMOVE</button>
+              <button type="button" class="chip" (click)="confirmRemove.set(false)">KEEP</button>
+            </span>
+          } @else {
+            <button type="button" class="btn out" (click)="confirmRemove.set(true)">Remove</button>
+          }
+        </div>
+      }
+
+      @if (error(); as message) {
+        <p class="error mono" role="alert">{{ message }}</p>
+      }
+    </div>
+  </section>
+
+  <section class="body">
+    <div class="section-head">
+      <h2>{{ v.heading }}</h2>
+      <span>Sorted by number from the file name</span>
+    </div>
+    <div class="vols">
+      @for (vol of volumes(); track vol.id; let i = $index) {
+        <a class="vol stagger" [style.--i]="i" [routerLink]="['/read', vol.id]">
+          <koma-cover class="thin" [volumeId]="vol.id" [badge]="vol.badge" />
+          <span class="meta mono">
+            <b>{{ vol.label }}</b>
+            <span>{{ vol.status }}</span>
+          </span>
+          <span class="bar" aria-hidden="true"><i [style.width.%]="vol.percent"></i></span>
+        </a>
+      }
+      <a class="vol add mono" routerLink="/import">+ ADD<br />{{ v.addLabel }}</a>
+    </div>
+
+    <h2 class="files-head">Files</h2>
+    <table class="mono">
+      <thead>
+        <tr>
+          <th>FILE</th>
+          <th>VOLUME</th>
+          <th>SIZE</th>
+          <th>PAGES</th>
+          <th>ARCHIVE</th>
+          <th>OPENED IN</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (vol of volumes(); track vol.id) {
+          <tr>
+            <td class="file" [title]="vol.path">{{ vol.file }}</td>
+            <td>{{ vol.label }}</td>
+            <td>{{ vol.size }}</td>
+            <td>{{ vol.pages }}</td>
+            <td [class.missing]="vol.missing">{{ vol.archive }}</td>
+            <td>{{ vol.opened }}</td>
+            <td class="row-actions">
+              <button type="button" (click)="setRead(vol.id, !vol.finished)">
+                {{ vol.finished ? 'MARK UNREAD' : 'MARK READ' }}
+              </button>
+              <button type="button" (click)="removeVolume(vol.id)" title="Removes it from the library. The file stays on disk.">
+                REMOVE
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+} @else if (library.loaded()) {
+  <section class="gone">
+    <h1 class="display">Not on the shelf</h1>
+    <p>This series is not in your library any more.</p>
+    <a class="btn" routerLink="/library">Back to library</a>
+  </section>
+}

@@ -1,0 +1,264 @@
+:host {
+  display: block;
+  padding: 6px var(--gutter) 30px;
+}
+
+header h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 58px;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+header p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.notice,
+.empty {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border: var(--border-control) solid var(--ink);
+}
+.notice.error {
+  border-color: var(--acc);
+  color: var(--acc);
+  user-select: text;
+}
+.notice.watch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-color: var(--acc);
+}
+.empty {
+  margin: 0;
+  border-style: dashed;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 30px;
+  margin-top: 18px;
+  align-items: start;
+}
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Drop zone */
+.drop {
+  position: relative;
+  min-height: 330px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  background: var(--panel);
+  transition: background var(--t-ui) var(--ease);
+}
+.drop.over {
+  background: color-mix(in srgb, var(--acc) 14%, var(--panel));
+}
+.ants {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.ants rect {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-dasharray: 10 8;
+  animation: march 1s linear infinite;
+}
+@keyframes march {
+  to {
+    stroke-dashoffset: -36;
+  }
+}
+.icon {
+  width: 70px;
+  height: 70px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+.icon .sheet {
+  fill: var(--acc);
+  stroke: none;
+}
+.drop h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+.drop p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+.scanning {
+  letter-spacing: 1px;
+  color: var(--acc) !important;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+.rule {
+  margin: 0;
+  padding: 10px 12px;
+  border: var(--border-control) solid var(--ink);
+  line-height: 1.6;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.option {
+  min-height: 44px;
+  padding: 12px;
+  border: var(--border-control) solid var(--ink);
+  background: var(--panel);
+  text-align: left;
+  transition: box-shadow var(--t-micro) var(--ease);
+}
+.option[aria-pressed='true'] {
+  box-shadow: 5px 5px 0 var(--acc);
+}
+.option b {
+  display: block;
+  font-size: 13px;
+}
+.option small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+.option .folder {
+  margin-top: 4px;
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
+
+/* Queue */
+.queue-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.queue-head b {
+  flex: 1;
+  font-size: 20px;
+}
+.queue-head .btn {
+  height: 40px;
+  padding: 0 14px;
+}
+.clear {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-decoration: underline;
+}
+.clear:hover {
+  color: var(--text);
+}
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Library summary */
+.shelf {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: var(--border-panel) solid var(--ink);
+}
+.shelf h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.shelf h2 span {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 18px;
+}
+figure {
+  margin: 0;
+}
+figure .cover {
+  display: block;
+  aspect-ratio: 3 / 4.3;
+  border: var(--border-panel) solid var(--ink);
+  background: var(--bg2);
+  overflow: hidden;
+  transition:
+    transform var(--t-micro) var(--ease),
+    box-shadow var(--t-micro) var(--ease);
+}
+figure .cover:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 8px 8px 0 var(--acc);
+}
+figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+figcaption {
+  margin-top: 6px;
+}
+figcaption b {
+  display: block;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+figcaption span {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}

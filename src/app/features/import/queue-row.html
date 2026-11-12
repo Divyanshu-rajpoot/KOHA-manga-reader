@@ -1,0 +1,95 @@
+@let r = row();
+
+<div class="cover" aria-hidden="true">
+  @if (coverUrl(); as url) {
+    <img [src]="url" alt="" />
+  } @else {
+    <span>{{ r.number ?? '?' }}</span>
+  }
+</div>
+
+<div class="body">
+  <div class="head">
+    <b class="file">{{ r.candidate.fileName }}</b>
+    <span class="mono size">{{ size() }}</span>
+    @if (!locked()) {
+      <button type="button" class="remove" aria-label="Remove from queue" (click)="removed.emit()">
+        ×
+      </button>
+    }
+  </div>
+
+  <div class="match">
+    <span>{{ matchLine() }}</span>
+    @if (r.status === 'ready' || locked()) {
+      @if (r.candidate.fromComicInfo) {
+        <span class="tag mono">COMICINFO</span>
+      }
+      @if (!r.candidate.existingSeries) {
+        <span class="tag mono">NEW SERIES</span>
+      }
+    }
+    @if (r.status === 'ready') {
+      <button type="button" class="edit mono" (click)="editing.set(!editing())">
+        {{ editing() ? 'DONE' : 'EDIT' }}
+      </button>
+    }
+  </div>
+
+  @if (showEditor()) {
+    <div class="editor">
+      <input
+        type="text"
+        aria-label="Series"
+        placeholder="Series title"
+        [value]="r.series"
+        [attr.list]="listId()"
+        (input)="setSeries($any($event.target).value)"
+      />
+      <datalist [id]="listId()">
+        @for (title of seriesTitles(); track title) {
+          <option [value]="title"></option>
+        }
+      </datalist>
+      <select aria-label="Volume or chapter" (change)="setUnit($any($event.target).value)">
+        <option value="volume" [selected]="r.unit === 'volume'">Vol.</option>
+        <option value="chapter" [selected]="r.unit === 'chapter'">Ch.</option>
+      </select>
+      <input
+        type="text"
+        class="number"
+        aria-label="Number, or a range like 1-5"
+        placeholder="No."
+        inputmode="decimal"
+        [value]="numberText()"
+        (change)="setNumber($any($event.target).value)"
+      />
+    </div>
+  }
+
+  @if (r.status !== 'error' && r.status !== 'duplicate') {
+    <div
+      class="bar"
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      [attr.aria-valuenow]="(r.fraction * 100).toFixed(0)"
+    >
+      <i [style.width.%]="r.fraction * 100"></i>
+    </div>
+    <div class="steps">
+      <span class="on">✓ Read index {{ indexTime() }}</span>
+      @if (r.step === 'copy') {
+        <span class="on">… Copying</span>
+      }
+      <span [class.on]="coverDone()">{{ coverDone() ? '✓' : '…' }} Cover</span>
+      <span [class.on]="r.status === 'done'">
+        {{ r.status === 'done' ? '✓' : '' }} Thumbnails
+        @if (r.step === 'thumbs') {
+          {{ r.thumbsDone }} / {{ r.candidate.pages }}
+        }
+      </span>
+      <span class="pages mono">{{ r.candidate.pages }} pp</span>
+    </div>
+  }
+</div>

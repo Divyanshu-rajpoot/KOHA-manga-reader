@@ -1,0 +1,22 @@
+/* Halftone dots and speed-line bursts. See docs/DESIGN.md §3. */
+.tex-dots {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--ink) 1.1px, transparent 1.4px);
+  background-size: 7px 7px;
+  opacity: 0.09;
+  pointer-events: none;
+}
+
+.tex-burst {
+  position: absolute;
+  inset: -40%;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    var(--ink) 0 1deg,
+    transparent 1deg 8deg
+  );
+  opacity: 0.09;
+  animation: spin 80s linear infinite;
+  pointer-events: none;
+}

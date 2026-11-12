@@ -45,3 +45,4 @@ A fast, offline desktop reader for **locally imported CBZ files** (manga and man
 - Dev: `npm run tauri dev`
 - Build: `npm run tauri build`
 - Rust tests: `cd src-tauri && cargo test`
+- 6 GB archive benchmark (writes a temp file, then deletes it): `cd src-tauri && cargo test benchmark_6gb -- --ignored --nocapture`

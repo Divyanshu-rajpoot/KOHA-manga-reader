@@ -1,0 +1,59 @@
+/* KOMA · Ink Archive tokens. See docs/DESIGN.md §1. Never hard-code colors elsewhere. */
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f1eee6;
+  --bg2: #e5e1d6;
+  --panel: #faf8f3;
+  --panel2: #ffffff;
+  --text: #0e0e0e;
+  --muted: #55524c;
+  --ink: #0e0e0e;
+  --on-ink: #f1eee6;
+  --acc-red: #e3242b;
+  --acc: var(--acc-red);
+  --on-acc: #ffffff;
+  --line: rgba(14, 14, 14, 0.2);
+  --reader-bg: #e9e5dc;
+  /* Title bar stays ink in both themes. */
+  --titlebar-bg: #0e0e0e;
+  --titlebar-text: #f1eee6;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #121110;
+  --bg2: #1e1c1a;
+  --panel: #191816;
+  --panel2: #1f1d1a;
+  --text: #ede8dd;
+  --muted: #a9a296;
+  --ink: #ede8dd;
+  --on-ink: #121110;
+  --acc-red: #ec4237;
+  --acc: var(--acc-red);
+  --on-acc: #ffffff;
+  --line: rgba(237, 232, 221, 0.18);
+  --reader-bg: #0d0c0b;
+  --titlebar-bg: #0a0a09;
+  --titlebar-text: #ede8dd;
+}
+
+/* Optional accent, offered in Settings → Appearance. */
+:root[data-accent='orange'] {
+  --acc: var(--acc-orange);
+}
+
+:root {
+  --acc-orange: #ff5b00;
+
+  --font-display: 'Anton', 'Arial Narrow', sans-serif;
+  --font-body: 'Archivo', 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', Consolas, monospace;
+  --font-jp: 'Noto Sans JP', 'Yu Gothic UI', sans-serif;
+
+  --border-control: 2px;
+  --border-panel: 3px;
+  --gutter: 36px;
+  --titlebar-h: 36px;
+}

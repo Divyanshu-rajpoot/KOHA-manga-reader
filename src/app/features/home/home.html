@@ -1,0 +1,89 @@
+@if (current(); as c) {
+  <section class="top">
+    <div class="info">
+      <!-- Tracked by series so the block is rebuilt, and slams in, each time the carousel turns. -->
+      @for (block of [c]; track block.series.id) {
+        <div class="mono eyebrow">{{ block.eyebrow }}</div>
+
+        <div class="number slam-in" [attr.aria-label]="'Volume ' + block.number">
+          <span class="numero" aria-hidden="true">N<span>o</span></span
+          ><span class="vol" aria-hidden="true">{{ block.number }}</span>
+        </div>
+
+        <h1 class="title slam-in">{{ block.series.title }}</h1>
+
+        <div class="mono meta">
+          @if (block.series.titleJp) {
+            <span class="jp">{{ block.series.titleJp }}</span> /
+          }
+          {{ block.meta }}
+        </div>
+
+        <koma-seg-progress class="slam-in" [value]="block.progress" />
+        <div class="mono page">{{ block.pageLine }}</div>
+
+        <div class="actions">
+          <a class="btn acc" [routerLink]="['/read', block.volume.id]">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2.5v11l9-5.5z" /></svg>
+            {{ block.resumeLabel }}
+          </a>
+          <a class="btn out" [routerLink]="['/series', block.series.id]">OPEN SERIES</a>
+        </div>
+      }
+    </div>
+
+    <div class="stage">
+      <div class="tex-burst"></div>
+      <div class="tex-dots"></div>
+      <div class="tag mono">{{ tag() }}</div>
+      @for (bubble of [c.bubble + c.series.id]; track bubble) {
+        <div class="bubble">{{ c.bubble }}!</div>
+      }
+      <koma-carousel [items]="items()" [(index)]="index" />
+    </div>
+  </section>
+
+  <section class="mid">
+    <div class="panel">
+      <h2>{{ c.cardTitle }}</h2>
+      <koma-reading-card [volume]="c.volume" />
+    </div>
+
+    <div class="panel">
+      <h2>Up next in this series</h2>
+      <div class="up-next">
+        @for (next of c.upNext; track next.id) {
+          <a [routerLink]="['/read', next.id]">
+            <koma-cover class="thin" [volumeId]="next.id" />
+            <small class="mono">{{ next.label }}</small>
+          </a>
+        }
+        @if (c.importNumber; as number) {
+          <a class="caught-up mono" routerLink="/import">
+            ALL CAUGHT UP<br />+ IMPORT NO. {{ number }}
+          </a>
+        }
+      </div>
+    </div>
+
+    <a class="panel drop" routerLink="/import">
+      <div class="burst" aria-hidden="true"></div>
+      <h2>Import</h2>
+      <div class="big">Drop CBZ<br />files <span>here!</span></div>
+      <p>Or a whole folder. "Title v03.cbz" is filed as volume 3 of Title automatically, at any file size.</p>
+    </a>
+  </section>
+
+  <section class="catalog">
+    <koma-series-table [series]="library.series()" />
+  </section>
+} @else if (library.loaded()) {
+  <section class="blank">
+    <div class="number" aria-hidden="true">
+      <span class="numero">N<span>o</span></span><span class="vol">00</span>
+    </div>
+    <h1 class="title">Nothing on the shelf yet</h1>
+    <p>Add CBZ files or a folder to start your library. Everything stays on this PC.</p>
+    <a class="btn acc" routerLink="/import">Import volumes</a>
+  </section>
+}

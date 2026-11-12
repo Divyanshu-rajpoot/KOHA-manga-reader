@@ -1,0 +1,32 @@
+[package]
+name = "koma"
+version = "0.1.0"
+description = "KOMA: offline manga and manhwa reader"
+edition = "2021"
+
+[lib]
+name = "koma_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+zip = { version = "9.5.1", default-features = false, features = ["deflate"] }
+natord = "1.0.9"
+uuid = { version = "1.29.2", features = ["v4"] }
+tauri-plugin-dialog = "2.8.4"
+image = { version = "0.25.10", default-features = false, features = ["jpeg", "png", "webp", "gif", "bmp"] }
+rayon = "1.12.0"
+directories = "6.0.0"
+fast_image_resize = "6.1.0"
+lru = "0.19.0"
+notify = "8.2.2"
+
+# Image decoding and resizing are far too slow unoptimized, so dependencies
+# are always built optimized, even for `tauri dev`.
+[profile.dev.package."*"]
+opt-level = 3

@@ -1,0 +1,133 @@
+<header>
+  <h1>Import volumes</h1>
+  <p>Add CBZ files or a whole folder. Nothing is uploaded; KOMA only reads the files on your PC.</p>
+</header>
+
+@if (!inTauri) {
+  <p class="notice mono">Importing needs the desktop app. Run: npm run tauri dev</p>
+}
+@if (error(); as message) {
+  <p class="notice error mono" role="alert">{{ message }}</p>
+}
+
+@if (watchNew().length > 0) {
+  <p class="notice watch mono" role="status">
+    <span>{{ watchNew().length }} NEW {{ watchNew().length === 1 ? 'FILE' : 'FILES' }} IN YOUR WATCHED FOLDERS</span>
+    <button type="button" class="chip" (click)="reviewWatched()" [disabled]="scanning()">ADD TO QUEUE</button>
+  </p>
+}
+
+<div class="columns">
+  <div class="left">
+    <section class="drop" [class.over]="dragOver()">
+      <svg class="ants" aria-hidden="true">
+        <rect x="2" y="2" style="width: calc(100% - 4px); height: calc(100% - 4px)" />
+      </svg>
+      <svg class="icon" viewBox="0 0 70 70" aria-hidden="true">
+        <rect class="sheet" x="24" y="6" width="26" height="34" />
+        <rect class="sheet" x="18" y="12" width="26" height="34" />
+        <path d="M31 52V26M22 35l9-9 9 9M12 50v10h38V50" />
+      </svg>
+      <h2>{{ dragOver() ? 'Drop to add' : 'Drop CBZ files or a folder' }}</h2>
+      <p>CBZ · ZIP · folders are searched for archives · files of any size</p>
+      <div class="buttons">
+        <button type="button" class="btn" (click)="chooseFiles()" [disabled]="!inTauri || scanning()">
+          Choose files
+        </button>
+        <button type="button" class="btn out" (click)="chooseFolder()" [disabled]="!inTauri || scanning()">
+          Choose folder
+        </button>
+      </div>
+      @if (scanning()) {
+        <p class="mono scanning" role="status">READING INDEXES…</p>
+      }
+    </section>
+
+    <p class="rule mono">
+      Series detection: <b>&#123;Series&#125; v&#123;NN&#125;.cbz</b> ·
+      <b>&#123;Series&#125; Vol &#123;N&#125;.cbz</b> · <b>&#123;Series&#125; &#123;NN&#125;-&#123;NN&#125;.cbz</b> ·
+      <b>&#123;Series&#125; c&#123;NNN&#125;.cbz</b>. A ComicInfo.xml inside the archive overrides the file name.
+    </p>
+
+    <div class="options" role="group" aria-label="Where to keep imported files">
+      <button
+        type="button"
+        class="option"
+        [attr.aria-pressed]="storage() === 'linked'"
+        [disabled]="importing()"
+        (click)="storage.set('linked')"
+      >
+        <b>Keep files where they are</b>
+        <small>KOMA saves only a link. No extra disk space used.</small>
+      </button>
+      <button
+        type="button"
+        class="option"
+        [attr.aria-pressed]="storage() === 'copied'"
+        [disabled]="importing()"
+        (click)="storage.set('copied')"
+      >
+        <b>Copy into KOMA library folder</b>
+        <small>One tidy folder: Series\Vol NN.cbz</small>
+        @if (libraryFolder()) {
+          <small class="mono folder">{{ libraryFolder() }}</small>
+        }
+      </button>
+    </div>
+  </div>
+
+  <div class="right">
+    @if (rows().length > 0) {
+      <div class="queue-head">
+        <b>Detected · {{ queueSummary() }}</b>
+        @if (finishedCount() > 0 && !importing()) {
+          <button type="button" class="clear mono" (click)="clearFinished()">CLEAR FINISHED</button>
+        }
+        <button type="button" class="btn acc" (click)="addAll()" [disabled]="readyCount() === 0 || importing()">
+          {{ importing() ? 'Adding…' : readyCount() === 1 ? 'Add 1 file' : 'Add all ' + readyCount() }}
+        </button>
+      </div>
+      <div class="queue">
+        @for (row of rows(); track row.candidate.path) {
+          <koma-queue-row
+            [row]="row"
+            [seriesTitles]="seriesTitles()"
+            (edited)="edit(row.candidate.path, $event)"
+            (removed)="remove(row.candidate.path)"
+          />
+        }
+      </div>
+    } @else {
+      <p class="empty mono">NOTHING IN THE QUEUE YET. DROP FILES ON THE LEFT, OR CHOOSE THEM.</p>
+    }
+  </div>
+</div>
+
+<section class="shelf">
+  <h2>
+    In your library
+    <span class="mono">
+      {{ library.series().length }} SERIES · {{ library.volumeCount() }} VOLUMES · {{ librarySize() }}
+    </span>
+  </h2>
+  @if (library.series().length === 0) {
+    <p class="empty mono">YOUR LIBRARY IS EMPTY.</p>
+  } @else {
+    <div class="grid">
+      @for (series of library.series(); track series.id) {
+        <figure>
+          <a class="cover" [routerLink]="['/series', series.id]" [attr.aria-label]="'Open ' + series.title">
+            <img [src]="coverUrl(series.volumes[0].id)" alt="" loading="lazy" />
+          </a>
+          <figcaption>
+            <b>{{ series.title }}</b>
+            <span class="mono">
+              {{ series.volumes.length }} {{ series.volumes.length === 1 ? 'FILE' : 'FILES' }} ·
+              {{ series.type }}
+            </span>
+          </figcaption>
+        </figure>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,239 @@
+:host {
+  display: block;
+}
+
+/* --- top band: info column + carousel --- */
+.top {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  margin: 4px var(--gutter) 16px;
+  border-top: var(--border-panel) solid var(--ink);
+  border-bottom: var(--border-panel) solid var(--ink);
+}
+
+.info {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  padding: 20px 26px 22px 0;
+  border-right: var(--border-panel) solid var(--ink);
+}
+
+.eyebrow {
+  letter-spacing: 1px;
+}
+
+.number {
+  font-family: var(--font-display);
+  font-size: 146px;
+  line-height: 0.95;
+  letter-spacing: -1px;
+}
+.vol {
+  color: var(--acc);
+}
+/* "№" drawn from N + a raised, underlined o, so it always renders in Anton. */
+.numero span {
+  display: inline-block;
+  font-size: 0.56em;
+  line-height: 1;
+  vertical-align: 0.62em;
+  padding-bottom: 0.06em;
+  margin: 0 0.06em 0 0.03em;
+  border-bottom: 0.11em solid currentColor;
+}
+
+.title {
+  margin: 2px 0 8px;
+  font-family: var(--font-display);
+  font-size: 58px;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  animation-delay: 50ms;
+}
+
+.jp {
+  font-family: var(--font-jp);
+  font-weight: 500;
+}
+
+koma-seg-progress {
+  margin: 16px 0 6px;
+  animation-delay: 100ms;
+}
+
+.page {
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.actions svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.stage {
+  position: relative;
+  overflow: hidden;
+  background: var(--panel2);
+}
+.tag {
+  position: absolute;
+  left: 18px;
+  top: 16px;
+  z-index: 20;
+  padding: 6px 10px;
+  background: var(--ink);
+  color: var(--on-ink);
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+.bubble {
+  position: absolute;
+  right: 26px;
+  top: 22px;
+  z-index: 20;
+  max-width: 110px;
+  padding: 14px 18px;
+  border: var(--border-panel) solid var(--ink);
+  border-radius: 50%;
+  background: var(--panel2);
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.15;
+  text-align: center;
+  text-transform: uppercase;
+  animation: pop 500ms cubic-bezier(0.3, 1.6, 0.5, 1) 300ms both;
+}
+
+/* --- mid row: three slanted panels --- */
+.mid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 0 var(--gutter) 18px;
+}
+.panel {
+  position: relative;
+  min-height: 262px;
+  padding: 16px;
+  border: var(--border-panel) solid var(--ink);
+  background: var(--panel);
+  overflow: hidden;
+  animation: slam 500ms var(--ease-slam) both;
+}
+.panel:nth-child(1) {
+  clip-path: polygon(0 0, 100% 0, 97% 100%, 0 100%);
+}
+.panel:nth-child(2) {
+  animation-delay: 100ms;
+}
+.panel:nth-child(3) {
+  animation-delay: 200ms;
+  clip-path: polygon(3% 0, 100% 0, 100% 100%, 0 100%);
+}
+.panel h2 {
+  position: relative;
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.up-next {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.up-next a {
+  text-decoration: none;
+}
+.up-next koma-cover {
+  transition:
+    transform var(--t-ui) var(--ease),
+    box-shadow var(--t-ui) var(--ease);
+}
+.up-next a:hover koma-cover {
+  transform: translate(-3px, -3px);
+  box-shadow: 5px 5px 0 var(--acc);
+}
+.up-next small {
+  display: block;
+  margin-top: 5px;
+  font-size: 10px;
+}
+.caught-up {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 4.3;
+  border: var(--border-control) dashed var(--ink);
+  font-size: 10px;
+  line-height: 1.6;
+  text-align: center;
+}
+.caught-up:hover {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+/* The import panel is inverted: ink in the light theme, paper in the dark one. */
+.drop {
+  display: block;
+  padding-left: calc(16px + 3%);
+  background: var(--ink);
+  color: var(--on-ink);
+  text-decoration: none;
+}
+.drop h2 {
+  color: color-mix(in srgb, var(--on-ink) 60%, var(--ink));
+}
+.drop .burst {
+  position: absolute;
+  inset: -40%;
+  background: repeating-conic-gradient(from 0deg at 50% 50%, var(--on-ink) 0 1deg, transparent 1deg 8deg);
+  opacity: 0.12;
+  animation: spin 60s linear infinite;
+}
+.big {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: 46px;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+.big span {
+  color: var(--acc);
+}
+.drop p {
+  position: relative;
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.catalog {
+  padding: 0 var(--gutter) 30px;
+}
+
+/* --- empty library --- */
+.blank {
+  margin: 4px var(--gutter) 0;
+  padding: 20px 0 40px;
+  border-top: var(--border-panel) solid var(--ink);
+}
+.blank p {
+  max-width: 460px;
+  margin: 0 0 20px;
+  color: var(--muted);
+}

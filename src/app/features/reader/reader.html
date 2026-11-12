@@ -1,0 +1,140 @@
+<header class="top">
+  <div class="group">
+    <button type="button" class="box" aria-label="Back" (click)="back()">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" /></svg>
+    </button>
+    @for (m of modes; track m.id) {
+      <button
+        type="button"
+        class="box"
+        [attr.aria-pressed]="mode() === m.id"
+        [title]="'Shortcut: ' + m.key"
+        (click)="setMode(m.id)"
+      >
+        {{ m.label }}
+      </button>
+    }
+  </div>
+
+  <div class="heading">
+    <h1>{{ title() }}</h1>
+    @if (pageCount() > 0) {
+      <p class="mono">{{ pageLabel() }}</p>
+    }
+  </div>
+
+  <div class="group end">
+    <button type="button" class="box" [attr.aria-pressed]="fit() === 'fit'" title="Shortcut: F" (click)="fit.set('fit')">
+      Fit
+    </button>
+    <button
+      type="button"
+      class="box"
+      [attr.aria-pressed]="fit() === 'width'"
+      title="Page as wide as the screen. Shortcut: F"
+      (click)="fit.set('width')"
+    >
+      Width
+    </button>
+    <button
+      type="button"
+      class="box"
+      [attr.aria-pressed]="fit() === 'actual'"
+      title="Shortcut: F"
+      (click)="fit.set('actual')"
+    >
+      100%
+    </button>
+    <button
+      type="button"
+      class="box"
+      [attr.aria-pressed]="win.fullscreen()"
+      title="Shortcut: F11"
+      (click)="toggleFullscreen()"
+    >
+      Full screen
+    </button>
+    <button
+      type="button"
+      class="box"
+      aria-label="More options"
+      [attr.aria-expanded]="menuOpen()"
+      (click)="menuOpen.set(!menuOpen())"
+    >
+      ···
+    </button>
+    @if (menuOpen()) {
+      <div class="menu" role="menu">
+        <button type="button" role="menuitem" (click)="toggleDirection()">
+          Reading direction
+          <span class="mono">{{ direction() === 'rtl' ? 'RIGHT TO LEFT' : 'LEFT TO RIGHT' }}</span>
+        </button>
+        <button type="button" role="menuitem" (click)="toggleFullscreen()">
+          {{ win.fullscreen() ? 'Leave full screen' : 'Full screen' }}
+          <span class="mono">F11</span>
+        </button>
+        <p class="mono">
+          ← → TURN PAGE · SPACE NEXT · HOME / END<br />
+          1 2 3 MODE · F FIT · ESC BACK
+        </p>
+      </div>
+    }
+  </div>
+</header>
+
+<main class="stage" (click)="onStageClick($event)" (wheel)="onWheel($event)">
+  @if (missing()) {
+    <p class="message mono">THIS VOLUME IS NOT IN YOUR LIBRARY.</p>
+  } @else if (error(); as message) {
+    <p class="message mono" role="alert">{{ message }}</p>
+  } @else if (pageCount() === 0) {
+    <p class="message mono" role="status">OPENING…</p>
+  } @else if (mode() === 'strip') {
+    <koma-strip-view
+      [volumeId]="volumeId()"
+      [sizes]="sizes()"
+      [fit]="fit()"
+      [bare]="win.fullscreen()"
+      [page]="page()"
+      (pageChange)="page.set($event)"
+    />
+  } @else {
+    <koma-paged-view
+      [volumeId]="volumeId()"
+      [pages]="currentPages()"
+      [sizes]="sizes()"
+      [direction]="direction()"
+      [fit]="fit()"
+      [bare]="win.fullscreen()"
+    />
+  }
+
+  @if (ended()) {
+    <div class="end-card" role="dialog" aria-label="End of volume" (click)="$event.stopPropagation()">
+      <p class="mono">END OF</p>
+      <h2>{{ title() }}</h2>
+      <div class="actions">
+        @if (nextVolume()) {
+          <button type="button" class="btn acc" (click)="openNextVolume()">
+            Read {{ nextVolumeLabel() }}
+          </button>
+        } @else {
+          <p class="mono caught-up">ALL CAUGHT UP</p>
+        }
+        <button type="button" class="btn out" (click)="back()">Back</button>
+        <button type="button" class="btn out" (click)="ended.set(false)">Keep reading</button>
+      </div>
+    </div>
+  }
+</main>
+
+@if (pageCount() > 0) {
+  <koma-thumb-strip
+    [volumeId]="volumeId()"
+    [pageCount]="pageCount()"
+    [page]="page()"
+    [direction]="mode() === 'strip' ? 'ltr' : direction()"
+    [cached]="cached()"
+    (seek)="goTo($event)"
+  />
+}

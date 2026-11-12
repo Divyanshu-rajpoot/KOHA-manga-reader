@@ -1,0 +1,72 @@
+<header>
+  <div>
+    <h1 class="display">Library</h1>
+    <p class="mono summary">{{ summary() }}</p>
+  </div>
+  <div class="seg" role="group" aria-label="View">
+    <button type="button" [attr.aria-pressed]="view() === 'covers'" (click)="setView('covers')">Covers</button>
+    <button type="button" [attr.aria-pressed]="view() === 'details'" (click)="setView('details')">Details</button>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="chips" role="group" aria-label="Filter">
+    @for (f of filters; track f.id) {
+      <button type="button" class="chip" [attr.aria-pressed]="filter() === f.id" (click)="filter.set(f.id)">
+        {{ f.label }}
+      </button>
+    }
+  </div>
+  <label class="sort">
+    Sort:
+    <select #sortBox [value]="sort()" (change)="setSort(sortBox.value)">
+      @for (s of sorts; track s.id) {
+        <option [value]="s.id" [selected]="sort() === s.id">{{ s.label }}</option>
+      }
+    </select>
+  </label>
+</div>
+
+@if (query(); as q) {
+  <p class="mono searching">
+    {{ cards().length }} {{ cards().length === 1 ? 'MATCH' : 'MATCHES' }} FOR “{{ q }}”
+    <a class="chip" routerLink="/library">CLEAR</a>
+  </p>
+}
+
+@if (cards().length > 0) {
+  @if (view() === 'covers') {
+    <div class="grid">
+      @for (card of cards(); track card.id; let i = $index) {
+        <a class="card stagger" [style.--i]="i" [routerLink]="['/series', card.id]">
+          <koma-cover [volumeId]="card.coverId" />
+          <b class="title">{{ card.title }}</b>
+          <span class="mono sub">{{ card.readLine }}</span>
+          <span class="bar" aria-hidden="true"><i [style.width.%]="card.percent"></i></span>
+        </a>
+      }
+    </div>
+  } @else {
+    <div class="list">
+      @for (card of cards(); track card.id; let i = $index) {
+        <a class="row stagger" [style.--i]="i" [routerLink]="['/series', card.id]">
+          <koma-cover class="thin" [volumeId]="card.coverId" />
+          <span>
+            <b class="title">{{ card.title }}</b>
+            <span class="mono sub">{{ card.readLine }}</span>
+          </span>
+          <span class="mono cell">{{ card.type }}</span>
+          <span class="mono cell">{{ card.volumes }}</span>
+          <span class="mono cell">{{ card.size }}</span>
+          <span class="bar" aria-hidden="true"><i [style.width.%]="card.percent"></i></span>
+        </a>
+      }
+    </div>
+  }
+} @else if (library.loaded()) {
+  @if (library.series().length === 0) {
+    <p class="empty-note">Your library is empty. <a routerLink="/import">Import volumes</a> to fill the shelf.</p>
+  } @else {
+    <p class="empty-note">Nothing matches this filter.</p>
+  }
+}

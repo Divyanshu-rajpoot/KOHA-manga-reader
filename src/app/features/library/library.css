@@ -1,0 +1,142 @@
+:host {
+  display: block;
+  padding: 6px var(--gutter) 30px;
+}
+
+header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin: 10px 0 16px;
+}
+.summary {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.sort {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+.sort select {
+  height: 30px;
+  padding: 0 6px;
+  border: var(--border-control) solid var(--ink);
+  border-radius: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.searching {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -8px 0 18px;
+  letter-spacing: 1px;
+}
+.searching a {
+  text-decoration: none;
+}
+
+/* --- covers --- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 26px 22px;
+}
+.card {
+  display: block;
+  min-width: 0;
+  text-decoration: none;
+}
+.card koma-cover {
+  transition:
+    transform var(--t-ui) var(--ease),
+    box-shadow var(--t-ui) var(--ease);
+}
+.card:hover koma-cover,
+.card:focus-visible koma-cover {
+  transform: translate(-4px, -4px);
+  box-shadow: 8px 8px 0 var(--acc);
+}
+.title {
+  display: block;
+  margin-top: 10px;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.sub {
+  display: block;
+  margin: 2px 0 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.bar {
+  display: block;
+  height: 3px;
+  background: var(--line);
+}
+.bar i {
+  display: block;
+  height: 100%;
+  background: var(--acc);
+}
+
+/* --- details: a catalog list --- */
+.row {
+  display: grid;
+  grid-template-columns: 46px 1.3fr 0.8fr 0.6fr 0.6fr 1fr;
+  gap: 18px;
+  align-items: center;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--ink);
+  text-decoration: none;
+}
+.row .title {
+  margin: 0;
+}
+.row .sub {
+  margin: 0;
+}
+.cell {
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.row:hover,
+.row:focus-visible {
+  background: var(--acc);
+  color: var(--on-acc);
+}
+.row:hover .sub,
+.row:hover .cell,
+.row:focus-visible .sub,
+.row:focus-visible .cell {
+  color: var(--on-acc);
+}
+.row:hover .bar,
+.row:focus-visible .bar {
+  background: color-mix(in srgb, var(--on-acc) 35%, transparent);
+}
+.row:hover .bar i,
+.row:focus-visible .bar i {
+  background: var(--on-acc);
+}
